@@ -1,0 +1,10 @@
+"Night city pack"
+   This pcakge made in 3dx max.Textures are high quality about 4000x4000 and atlas texture.olny three altas used .Diffuse 
+Normal and illumination mape used.Tris below 300 of all models except street light.
+Different road segment are included that are suitable for creating road map.
+
+tHIS PACKAGE will be helpful for night environment.
+If you have any suggestion or question about this package you can 
+contact me freely :
+
+kumfustudio1177@gmail.com
