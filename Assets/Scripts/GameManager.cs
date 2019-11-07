@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -47,9 +48,19 @@ public class GameManager : MonoBehaviour
 
     public void Die()
     {
-            UIManager.Instance.SetStatus(Constants.StatusDeadTapToStart);
-            this.GameState = GameState.Dead; 
+        if(GameManager.Instance.GameState != GameState.Playing){
+            //UIManager.Instance.SetStatus(Constants.StatusDeadTapToStart);
+            this.GameState = GameState.Dead;
+            Invoke("GoToGameOver", 1.5f);
+        }
+            
     }
+
+    void GoToGameOver()
+    {
+        SceneManager.LoadScene("GameOver");
+    }
+
 
     public void Goal()
     {

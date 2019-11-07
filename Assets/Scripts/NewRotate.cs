@@ -1,6 +1,8 @@
+//最新版
 ﻿using UnityEngine;
 using Assets.Scripts;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class NewRotate : MonoBehaviour
 {
@@ -15,7 +17,7 @@ public class NewRotate : MonoBehaviour
     public float gravity = 20f;//重力　ジャンプ用
     public float JumpSpeed = 10.0f;//ジャンプスピード　ジャンプ用
     public float Speed = 6.0f;//スピード　移動用
-    public float RotateSpeed = 100f;//回転速度　回転用
+    public int RotateSpeed = 2;//回転速度　回転用
 
     bool inInSwipeArea;//移動エリア判定用
 
@@ -57,26 +59,65 @@ public class NewRotate : MonoBehaviour
     {
         switch (GameManager.Instance.GameState)//ゲーム状態による場合分け
         {
+            case GameState.GemGetSingleTutorial:
+                if(Input.GetKeyDown(KeyCode.Space)){
+                    GameManager.Instance.GameState = GameState.Playing;
+                    TutorialManager.Instance.changeGameState(GameState.Playing);
+                }
+                break;
+
+            case GameState.GemGetContinuousTutorial:
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    GameManager.Instance.GameState = GameState.Playing;
+                    TutorialManager.Instance.changeGameState(GameState.Playing);
+                }
+                break;
+
+            case GameState.ObstacleTutorial:
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    GameManager.Instance.GameState = GameState.Playing;
+                    TutorialManager.Instance.changeGameState(GameState.Playing);
+                }
+                break;
+
+            case GameState.TurnRightTutorial:
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    GameManager.Instance.GameState = GameState.Playing;
+                    TutorialManager.Instance.changeGameState(GameState.Playing);
+                }
+                break;
+
+            case GameState.TurnLeftTutorial:
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    GameManager.Instance.GameState = GameState.Playing;
+                    TutorialManager.Instance.changeGameState(GameState.Playing);
+                }
+                break;
+
             case GameState.Start://ゲーム状態がスタートの場合
                 if (Input.GetMouseButtonUp(0))//マウスのボタンが離された時trueを返す
                 {
                     anim.SetBool(Constants.AnimationStarted, true);//AnimationStartedっていうアニメーションをtrueに変更
                     //var i=8;は int i=8;と同じ
                     var instance = GameManager.Instance;//instanceにGameManagerのInstanceを入れてる　インスタンスって何に使うの？
-                    instance.GameState = GameState.Playing;//インスタンスのゲーム状態をプレイ中に
+                    instance.GameState = GameState.MainPlaying;//インスタンスのゲーム状態をプレイ中に
                     UIManager.Instance.SetStatus(string.Empty);//ゲーム状態の表示を空に
+                    TimeManager.Instance.startTimer();//Timerカウントスタート
                 }
                 break;
 
             case GameState.Playing://ゲーム状態がプレイ中の場合
                 //UIManager.Instance.IncreaseScore(0.001f);//１フレームごとに点数追加
-                CheckHeight();//高さチェック関数
-                Jump();//ジャンプ関数
-                Rotate();//回転関数
-                Step();//横移動関数
 
-                moveDirection.y -= gravity * Time.deltaTime;//重力を場に発生させる
-                controller.Move(moveDirection * Time.deltaTime);//衝突しないなら動く
+                //Debug.Log("@@@" + moveDirection);
+                if (!isRotate)
+                {
+                    Move();
+                }
 
                 //スコアごとにスピード変更
                 /*if(UIManager.Instance.score > 400)
@@ -95,6 +136,13 @@ public class NewRotate : MonoBehaviour
                     moveDirection *= Speed;//単位ベクトルにスピード倍する
                 }*/
 
+                break;
+
+            case GameState.MainPlaying:
+                if (!isRotate)
+                {
+                    Move();
+                }
                 break;
 
             case GameState.Dead://ゲーム状態が死の場合
@@ -117,7 +165,35 @@ public class NewRotate : MonoBehaviour
         }
     }
 
-    
+    private void Move() {
+        CheckHeight();//高さチェック関数
+        Jump();//ジャンプ関数
+        Rotate();//回転関数
+        Step();//横移動関数
+
+        moveDirection.y -= gravity * Time.deltaTime;//重力を場に発生させる
+        controller.Move(moveDirection * Time.deltaTime);//衝突しないなら動く
+    }
+
+    //走る速度変更
+    public void SpeedChange(float speed){
+        Speed = speed;
+        moveDirection = Vector3.forward;
+        moveDirection = transform.TransformDirection(moveDirection);//移動方向をローカル空間からワールド空間へ変換
+        moveDirection *= Speed;
+        Debug.Log("@@@speed: " + Speed);
+    }
+
+    //回転速度変更
+    public void RotateSpeedChange()
+    {
+        RotateSpeed++;
+        Debug.Log("@@@rotatespeed: " + RotateSpeed);
+    }
+ 
+ 
+
+
     //Arduino通信用
     void OnDataReceived(string message)
     {
@@ -166,6 +242,28 @@ public class NewRotate : MonoBehaviour
         }
     }
 
+
+    private IEnumerator RotateCharacter(int rightOrLeft)
+    {
+
+        for (int count = 0; count <= 90; count++)
+        {
+            this.transform.Rotate(0, rightOrLeft, 0);
+
+            if (count % RotateSpeed == 0)
+            {
+                yield return new WaitForSeconds(0.001f);
+            }   
+        }
+        moveDirection = Vector3.forward;
+        moveDirection = transform.TransformDirection(moveDirection);//移動方向をローカル空間からワールド空間へ変換
+        moveDirection *= Speed;//単位ベクトルにスピード倍する
+        isRotate = false;
+        GameManager.Instance.CanRotate = false;
+
+    }
+
+
     //回転関数
     private void Rotate()
     {
@@ -179,8 +277,9 @@ public class NewRotate : MonoBehaviour
             )
         {
             isRotate = true;//回転中に変更
-            rotateDirection = transform.TransformDirection(Vector3.right);
-            targetRotation = Quaternion.LookRotation(rotateDirection, Vector3.up);//最終的な向きを保存　Vector.upを中心軸にVector3.rightまで回転
+            StartCoroutine("RotateCharacter", 1);
+            //rotateDirection = transform.TransformDirection(Vector3.right);
+            //targetRotation = Quaternion.LookRotation(rotateDirection, Vector3.up);//最終的な向きを保存　Vector.upを中心軸にVector3.rightまで回転
         }
         //左回転
         else if (GameManager.Instance.CanRotate
@@ -190,22 +289,14 @@ public class NewRotate : MonoBehaviour
             )
         {
             isRotate = true;//回転中に変更
-            rotateDirection = transform.TransformDirection(Vector3.left);
-            targetRotation = Quaternion.LookRotation(rotateDirection, Vector3.up);//最終的な向きを保存
+            StartCoroutine("RotateCharacter", -1);
+            //rotateDirection = transform.TransformDirection(Vector3.left);
+            //targetRotation = Quaternion.LookRotation(rotateDirection, Vector3.up);//最終的な向きを保存
         }
-        else if (isRotate)
-        {
-            float step = RotateSpeed * Time.deltaTime;
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, step);
-            if (transform.rotation == targetRotation)
-            {
-                isRotate = false;
-                moveDirection = Vector3.forward;
-                moveDirection = transform.TransformDirection(moveDirection);//移動方向をローカル空間からワールド空間へ変換
-                moveDirection *= Speed;//単位ベクトルにスピード倍する
-            }
-         }
+         
+        
     }
+
 
     //横移動関数
     private void Step()

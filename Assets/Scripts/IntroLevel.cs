@@ -11,6 +11,6 @@ public class IntroLevel : MonoBehaviour {
 
     public void RotatedLevelClick()
     {
-        SceneManager.LoadScene("rotatedPathsLevel");
+        SceneManager.LoadScene("tutorialGemGetSingle");
     }
 }
