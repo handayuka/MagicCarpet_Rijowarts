@@ -263,9 +263,15 @@ public class NewRotate : MonoBehaviour
         moveDirection *= Speed;//単位ベクトルにスピード倍する
         isRotate = false;
         GameManager.Instance.CanRotate = false;
+        turn = 0;
+
+
+
+
 
     }
 
+    public int turn = 0; //0:正面 1:right 2:left
 
     //回転関数
     private void Rotate()
@@ -279,6 +285,7 @@ public class NewRotate : MonoBehaviour
             && inputDirection == InputDirection.Right//キー入力が右キーの場合
             )
         {
+            turn = 1;
             isRotate = true;//回転中に変更
             StartCoroutine("RotateCharacter", 1);
             //rotateDirection = transform.TransformDirection(Vector3.right);
@@ -291,6 +298,7 @@ public class NewRotate : MonoBehaviour
             && inputDirection == InputDirection.Left//キー入力が右キーの場合
             )
         {
+            turn = 2;
             isRotate = true;//回転中に変更
             StartCoroutine("RotateCharacter", -1);
             //rotateDirection = transform.TransformDirection(Vector3.left);
