@@ -65,7 +65,6 @@ public class TurnCorner : SingletonMonoBehaviour<TurnCorner>, ISceneWasLoaded
     private void Start()
     {
         Init(sceneNum);
-        Debug.Log("@@@init" + hitFailureObject);
     }
 
 
@@ -131,7 +130,6 @@ public class TurnCorner : SingletonMonoBehaviour<TurnCorner>, ISceneWasLoaded
 
     private void CheckChangeScene()
     {
-        Debug.Log("@@@check");
         if (tutorialState == TutorialState.Success)
         {
             Invoke("ReadyToStart", 2.0f);
