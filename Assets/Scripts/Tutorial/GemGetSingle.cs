@@ -9,9 +9,7 @@ public class GemGetSingle : SingletonMonoBehaviour<GemGetSingle>
 
     [SerializeField] GameObject Tutorial1Set        = null;
     [SerializeField] GameObject GemGroupeRight      = null;
-    [SerializeField] GameObject GemGroupeLeft       = null;
-    [SerializeField] GameObject GemGroupeRightYobi  = null;
-    [SerializeField] GameObject GemGroupeLeftYobi   = null;
+    [SerializeField] GameObject GemGroupeLeft = null;
 
 
     private bool getGemRight = false;
@@ -19,7 +17,6 @@ public class GemGetSingle : SingletonMonoBehaviour<GemGetSingle>
 
     private TutorialState tutorialState = TutorialState.Judging;
 
-    private int count = 0;
 
     public void Init(Vector3 point)
     {
@@ -30,11 +27,9 @@ public class GemGetSingle : SingletonMonoBehaviour<GemGetSingle>
         getGemLeft = false;
 
         Tutorial1Set.SetActive(true);
-        if(count == 0){
+        
             GemGroupeRight.SetActive(true);
             GemGroupeLeft.SetActive(true);
-            GemGroupeRightYobi.SetActive(false);
-            GemGroupeLeftYobi.SetActive(false);
 
             this.ObserveEveryValueChanged(x => GemGroupeRight.transform.childCount)
             .Skip(1) //最初の一回の値の変動をスキップする
@@ -47,33 +42,14 @@ public class GemGetSingle : SingletonMonoBehaviour<GemGetSingle>
             this.ObserveEveryValueChanged(x => TutorialManager.Instance.tutorialState)
             .Skip(1) //最初の一回の値の変動をスキップする
             .Subscribe(_ => tutorialState = TutorialState.Failure);
-        }
-        else if(count == 1){
-            GemGroupeRight.SetActive(false);
-            GemGroupeLeft.SetActive(false);
-            GemGroupeRightYobi.SetActive(true);
-            GemGroupeLeftYobi.SetActive(true);
-
-            this.ObserveEveryValueChanged(x => GemGroupeRightYobi.transform.childCount)
-            .Skip(1) //最初の一回の値の変動をスキップする
-            .Subscribe(_ => checkGemGetAndSet(true, getGemLeft));
-
-            this.ObserveEveryValueChanged(x => GemGroupeLeftYobi.transform.childCount)
-                .Skip(1) //最初の一回の値の変動をスキップする
-                .Subscribe(_ => checkGemGetAndSet(getGemRight, true));
-
-            this.ObserveEveryValueChanged(x => TutorialManager.Instance.tutorialState)
-            .Skip(1) //最初の一回の値の変動をスキップする
-                .Subscribe(_ => tutorialState = TutorialState.Success);
-        }
-
-
-        this.ObserveEveryValueChanged(x => tutorialState)
-            .Skip(1) //最初の一回の値の変動をスキップする
-            .Subscribe(_ => sendToManager());
-
-
+        
+  
     }
+
+
+        /*this.ObserveEveryValueChanged(x => tutorialState)
+            .Skip(1) //最初の一回の値の変動をスキップする
+            .Subscribe(_ => sendToManager());*/
 
     private void GoToTutorialObstacles()
     { SceneManager.LoadScene("tutorialObstacles"); }
@@ -83,14 +59,14 @@ public class GemGetSingle : SingletonMonoBehaviour<GemGetSingle>
         getGemRight = getRight;
         getGemLeft = getLeft;
 
-        if (getGemRight && getGemRight) {
+        if (getGemRight && getGemLeft) {
             tutorialState = TutorialState.Success;
-            Invoke("GoToTutorialObstacles", 0.5f);
+      
         }
 
     }
 
-
+    /*
     private void sendToManager()
     {
         Tutorial1Set.SetActive(false);
@@ -101,5 +77,5 @@ public class GemGetSingle : SingletonMonoBehaviour<GemGetSingle>
             TutorialManager.Instance.changeGameState(GameState.GemGetSingleTutorial);
         }
 
-    }
+    }*/
 }
