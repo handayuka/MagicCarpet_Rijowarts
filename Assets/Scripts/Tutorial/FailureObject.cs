@@ -9,7 +9,6 @@ public class FailureObject : MonoBehaviour
         //if the player hits one obstacle, it's game over
         if (col.gameObject.tag == Constants.PlayerTag)
         {
-            Debug.Log("@@@hit" + TurnCorner.Instance.hitFailureObject);
             TurnCorner.Instance.hitFailureObject = true;
         }
     }
