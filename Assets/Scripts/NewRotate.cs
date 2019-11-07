@@ -101,6 +101,7 @@ public class NewRotate : MonoBehaviour
             case GameState.Start://ゲーム状態がスタートの場合
                 if (Input.GetMouseButtonUp(0))//マウスのボタンが離された時trueを返す
                 {
+                    Debug.Log("@@@start");
                     anim.SetBool(Constants.AnimationStarted, true);//AnimationStartedっていうアニメーションをtrueに変更
                     //var i=8;は int i=8;と同じ
                     var instance = GameManager.Instance;//instanceにGameManagerのInstanceを入れてる　インスタンスって何に使うの？
@@ -139,8 +140,10 @@ public class NewRotate : MonoBehaviour
                 break;
 
             case GameState.MainPlaying:
+                Debug.Log("@@@mainplaying!");
                 if (!isRotate)
                 {
+                    Debug.Log("@@@playing!");
                     Move();
                 }
                 break;
